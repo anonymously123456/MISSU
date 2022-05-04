@@ -125,7 +125,7 @@ def main_worker():
     torch.distributed.init_process_group('nccl')
     torch.cuda.set_device(args.local_rank)
 
-    _, model = TransBTS(dataset='brats', _conv_repr=True, _pe_type="learned")
+    _, model = MISSU(dataset='brats', _conv_repr=True, _pe_type="learned")
 
     model.cuda(args.local_rank)
     print(args.local_rank,'args.local_rank')
