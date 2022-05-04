@@ -11,7 +11,7 @@ import setproctitle
 import torch
 import torch.backends.cudnn as cudnn
 import torch.optim
-from models.TransBTS.TransBTS_downsample8x_skipconnection import TransBTS
+from models.MISSU.MISSU_downsample8x_skipconnection import MISSU
 import torch.distributed as dist
 from models import criterions
 
@@ -29,17 +29,17 @@ parser = argparse.ArgumentParser()
 # Basic Information
 parser.add_argument('--user', default='name of user', type=str)
 
-parser.add_argument('--experiment', default='TransBTS', type=str)
+parser.add_argument('--experiment', default='MISSU', type=str)
 
 parser.add_argument('--date', default=local_time.split(' ')[0], type=str)
 
 parser.add_argument('--description',
-                    default='TransBTS,'
+                    default='MISSU,'
                             'training on train.txt!',
                     type=str)
 
 # DataSet Information
-parser.add_argument('--root', default='/home/wn/TransBTS/data', type=str)
+parser.add_argument('--root', default='/home/wn/MISSU/data', type=str)
 
 parser.add_argument('--train_dir', default='Train', type=str)
 
@@ -53,7 +53,7 @@ parser.add_argument('--valid_file', default='valid.txt', type=str)
 
 parser.add_argument('--dataset', default='brats', type=str)
 
-parser.add_argument('--model_name', default='TransBTS', type=str)
+parser.add_argument('--model_name', default='MISSU', type=str)
 
 parser.add_argument('--input_C', default=4, type=int)
 
