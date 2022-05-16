@@ -20,7 +20,7 @@ class MISSU(nn.Module):
         conv_patch_representation=True,
         positional_encoding_type="learned",
     ):
-        super(TransformerSSU, self).__init__()
+        super(MISSU, self).__init__()
 
         assert embedding_dim % num_heads == 0
         assert img_dim % patch_dim == 0
