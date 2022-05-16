@@ -5,7 +5,7 @@ from models.MISSU.PositionalEncoding import FixedPositionalEncoding,LearnedPosit
 from models.MISSU.Unet_skipconnection import Unet
 
 
-class TransformerSSU(nn.Module):
+class MISSU(nn.Module):
     def __init__(
         self,
         img_dim,
@@ -152,7 +152,7 @@ class TransformerSSU(nn.Module):
         return x
 
 
-class SSU(TransformerSSU):
+class SSU(MISSU):
     def __init__(
         self,
         img_dim,
@@ -316,7 +316,7 @@ class DeBlock(nn.Module):
 
 
 
-def TransSSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
+def MISSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
 
     if dataset.lower() == 'brats':
         img_dim = 128
@@ -325,7 +325,7 @@ def TransSSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
     num_channels = 4
     patch_dim = 8
     aux_layers = [1, 2, 3, 4]
-    model = BTS(
+    model = SSU(
         img_dim,
         patch_dim,
         num_channels,
@@ -349,7 +349,7 @@ if __name__ == '__main__':
         os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
         cuda0 = torch.device('cuda:0')
         x = torch.rand((1, 4, 128, 128, 128), device=cuda0)
-        _, model = TransBTS(dataset='brats', _conv_repr=True, _pe_type="learned")
+        _, model = MISSU(dataset='brats', _conv_repr=True, _pe_type="learned")
         model.cuda()
         y = model(x)
         print(y.shape)
