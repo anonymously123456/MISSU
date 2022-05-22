@@ -157,7 +157,7 @@ class TransformerSSU(nn.Module):
 
 
 
-class SSU(TransformerBTS):
+class SSU(TransformerSSU):
     def __init__(
         self,
         img_dim,
@@ -173,7 +173,7 @@ class SSU(TransformerBTS):
         conv_patch_representation=True,
         positional_encoding_type="learned",
     ):
-        super(BTS, self).__init__(
+        super(SSU, self).__init__(
             img_dim=img_dim,
             patch_dim=patch_dim,
             num_channels=num_channels,
