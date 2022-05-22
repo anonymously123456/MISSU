@@ -3,7 +3,10 @@ import torch.nn as nn
 from models.MISSU.Transformer import TransformerModel
 from models.MISSU.PositionalEncoding import FixedPositionalEncoding,LearnedPositionalEncoding
 from models.MISSU.Unet_skipconnection import Unet
+from functools import partial
+import torch.nn.functional as F
 
+nonlinearity = partial(F.relu, inplace=True)
 
 class TransformerSSU(nn.Module):
     def __init__(
@@ -20,8 +23,7 @@ class TransformerSSU(nn.Module):
         conv_patch_representation=True,
         positional_encoding_type="learned",
     ):
-        super(TransformerSSU
-              , self).__init__()
+        super(TransformerSSU, self).__init__()
 
         assert embedding_dim % num_heads == 0
         assert img_dim % patch_dim == 0
@@ -111,6 +113,7 @@ class TransformerSSU(nn.Module):
 
         return x1_1, x2_1, x3_1, x, intmd_x
 
+
     def decode(self, x):
         raise NotImplementedError("Should be implemented in child class!!")
 
@@ -153,7 +156,8 @@ class TransformerSSU(nn.Module):
         return x
 
 
-class SSU(TransformerSSU):
+
+class SSU(TransformerBTS):
     def __init__(
         self,
         img_dim,
@@ -169,7 +173,7 @@ class SSU(TransformerSSU):
         conv_patch_representation=True,
         positional_encoding_type="learned",
     ):
-        super(SSU, self).__init__(
+        super(BTS, self).__init__(
             img_dim=img_dim,
             patch_dim=patch_dim,
             num_channels=num_channels,
@@ -190,14 +194,22 @@ class SSU(TransformerSSU):
         self.Enblock8_1 = EnBlock1(in_channels=self.embedding_dim)
         self.Enblock8_2 = EnBlock2(in_channels=self.embedding_dim // 4)
 
+       
+
         self.DeUp4 = DeUp_Cat(in_channels=self.embedding_dim//4, out_channels=self.embedding_dim//8)
         self.DeBlock4 = DeBlock(in_channels=self.embedding_dim//8)
-
+ 
+        self.Distill1 = DistillKL(in_channels=self.embedding_dim // 8,out_channels=self.embedding_dim//8) 
+        
         self.DeUp3 = DeUp_Cat(in_channels=self.embedding_dim//8, out_channels=self.embedding_dim//16)
         self.DeBlock3 = DeBlock(in_channels=self.embedding_dim//16)
+        
+        self.Distill2 = DistillKL(in_channels=self.embedding_dim//16,out_channels=self.embedding_dim//16) 
 
         self.DeUp2 = DeUp_Cat(in_channels=self.embedding_dim//16, out_channels=self.embedding_dim//32)
         self.DeBlock2 = DeBlock(in_channels=self.embedding_dim//32)
+        
+        self.Distill3 = DistillKL(in_channels=self.embedding_dim//32, out_channels=self.embedding_dim//32) 
 
         self.endconv = nn.Conv3d(self.embedding_dim // 32, 4, kernel_size=1)
 
@@ -215,22 +227,31 @@ class SSU(TransformerSSU):
         all_keys.reverse()
 
         x8 = encoder_outputs[all_keys[0]]
+     
         x8 = self._reshape_output(x8)
-        x8 = self.Enblock8_1(x8)
+        x8 = self.Enblock8_1(x8) 
         x8 = self.Enblock8_2(x8)
-
+      
         y4 = self.DeUp4(x8, x3_1)  # (1, 64, 32, 32, 32)
         y4 = self.DeBlock4(y4)
+
+        y4_k1 = self.Distill1(y4,x3_1)
 
         y3 = self.DeUp3(y4, x2_1)  # (1, 32, 64, 64, 64)
         y3 = self.DeBlock3(y3)
 
+        y4_k2 = self.Distill1(y3,x2_1)
+
         y2 = self.DeUp2(y3, x1_1)  # (1, 16, 128, 128, 128)
         y2 = self.DeBlock2(y2)
 
+        y4_k3 = self.Distill1(y2,x1_1)
+        
+        y_kall = y4_k3 + y4_k2 + y4_k1 
         y = self.endconv(y2)      # (1, 4, 128, 128, 128)
         y = self.Softmax(y)
-        return y
+        print(y_kall,'Distill Loss')
+        return y, y_kall
 
 class EnBlock1(nn.Module):
     def __init__(self, in_channels):
@@ -273,7 +294,6 @@ class EnBlock2(nn.Module):
         x1 = self.bn2(x1)
         x1 = self.relu2(x1)
         x1 = x1 + x
-
         return x1
 
 
@@ -315,6 +335,19 @@ class DeBlock(nn.Module):
         return x1
 
 
+class DistillKL(nn.Module):
+    def __init__(self,in_channels, out_channels):
+        super(DistillKL, self).__init__()
+
+    def forward(self, y_s, y_t):
+        D,B, C, H, W = y_s.size()
+        p_s = F.log_softmax(y_s, dim=1)
+        p_t = F.softmax(y_t, dim=1)
+        lossKL = F.kl_div(p_s, p_t.detach(), reduction='sum') / (B * H * W*D)
+        return lossKL
+
+
+
 def MISSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
 
     if dataset.lower() == 'brats':
@@ -329,10 +362,10 @@ def MISSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
         patch_dim,
         num_channels,
         num_classes,
-        embedding_dim=512,
-        num_heads=8,
+        embedding_dim=128,
+        num_heads=4,
         num_layers=4,
-        hidden_dim=2048,
+        hidden_dim=512,
         dropout_rate=0.1,
         attn_dropout_rate=0.1,
         conv_patch_representation=_conv_repr,
@@ -345,11 +378,10 @@ def MISSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
 if __name__ == '__main__':
     with torch.no_grad():
         import os
-        os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+        os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
         cuda0 = torch.device('cuda:0')
         x = torch.rand((1, 4, 128, 128, 128), device=cuda0)
         _, model = MISSU(dataset='brats', _conv_repr=True, _pe_type="learned")
         model.cuda()
         y = model(x)
-        # print(y.shape)
-
+        print(y.shape)
