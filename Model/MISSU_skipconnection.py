@@ -324,7 +324,7 @@ def MISSU(dataset='brats', _conv_repr=True, _pe_type="learned"):
     num_channels = 4
     patch_dim = 8
     aux_layers = [1, 2, 3, 4]
-    model = BTS(
+    model = SSU(
         img_dim,
         patch_dim,
         num_channels,
@@ -348,7 +348,7 @@ if __name__ == '__main__':
         os.environ['CUDA_VISIBLE_DEVICES'] = '0'
         cuda0 = torch.device('cuda:0')
         x = torch.rand((1, 4, 128, 128, 128), device=cuda0)
-        _, model = TransBTS(dataset='brats', _conv_repr=True, _pe_type="learned")
+        _, model = MISSU(dataset='brats', _conv_repr=True, _pe_type="learned")
         model.cuda()
         y = model(x)
         # print(y.shape)
