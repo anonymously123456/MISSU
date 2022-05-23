@@ -63,7 +63,7 @@ def parse_args():
 
     return args
 
-#获取某个分块的位置信息（0 32 64 96 128）以及 该块属于哪个病例
+
 def GetPatchPosition(PatchPath):
     npName = os.path.basename(PatchPath)
     firstName = npName
@@ -86,7 +86,7 @@ def hausdorff_distance(lT,lP):
     return hausdorffcomputer.GetAverageHausdorffDistance()#hausdorffcomputer.GetHausdorffDistance()
 
 def CalculateWTTCET(wtpbregion,wtmaskregion,tcpbregion,tcmaskregion,etpbregion,etmaskregion):
-    #开始计算WT
+ 
     dice = dice_coef(wtpbregion,wtmaskregion)
     wt_dices.append(dice)
     ppv_n = ppv(wtpbregion, wtmaskregion)
@@ -95,7 +95,7 @@ def CalculateWTTCET(wtpbregion,wtmaskregion,tcpbregion,tcmaskregion,etpbregion,e
     wt_Hausdorf.append(Hausdorff)
     sensitivity_n = sensitivity(wtpbregion, wtmaskregion)
     wt_sensitivities.append(sensitivity_n)
-    # 开始计算TC
+
     dice = dice_coef(tcpbregion, tcmaskregion)
     tc_dices.append(dice)
     ppv_n = ppv(tcpbregion, tcmaskregion)
@@ -104,7 +104,7 @@ def CalculateWTTCET(wtpbregion,wtmaskregion,tcpbregion,tcmaskregion,etpbregion,e
     tc_Hausdorf.append(Hausdorff)
     sensitivity_n = sensitivity(tcpbregion, tcmaskregion)
     tc_sensitivities.append(sensitivity_n)
-    # 开始计算ET
+  
     dice = dice_coef(etpbregion, etmaskregion)
     et_dices.append(dice)
     ppv_n = ppv(etpbregion, etmaskregion)
@@ -173,23 +173,23 @@ def main():
                 for i in range(output.shape[0]):
                     if (startFlag == 1):#第一个块的处理
                         startFlag = 0
-                        # 提取当前块的位置、名字
+                        
                         PatchPosition, NameNow = GetPatchPosition(img_paths[i])
                         LastName = NameNow
-                        # 创建两个全黑的三维矩阵，分别分别拼接后的预测、拼接后的Mask
+                       
                         OnePeople = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneMask = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 创建三个全黑的三维矩阵，分别用于预测出来的WT、TC、ET分块的拼接
+                     
                         OneWT = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneTC = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneET = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 创建三个全黑的三维矩阵，分别用于真实的WT、TC、ET分块的拼接
+                        
                         OneWTMask = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneTCMask = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneETMask = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 处理预测后的分块
+                     
                         # (2, 3, 32, 160, 160) output
-                        # 预测分块的拼接
+                      
                         for idz in range(output.shape[2]):
                             for idx in range(output.shape[3]):
                                 for idy in range(output.shape[4]):
@@ -199,16 +199,16 @@ def main():
                                         OneTC[PatchPosition + idz, idx, idy] = 1
                                     if output[i, 2, idz, idx, idy] > 0.5:  # ET拼接
                                         OneET[PatchPosition + idz, idx, idy] = 1
-                        # Mask分块的拼接
+                      
                         OneWTMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 0, :, :, :]
                         OneTCMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 1, :, :, :]
                         OneETMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 2, :, :, :]
-                    # 提取当前块的位置、名字
+                
                     PatchPosition, NameNow = GetPatchPosition(img_paths[i])
                     if (NameNow != LastName):
-                        # 计算指标
+                   
                         CalculateWTTCET(OneWT, OneWTMask, OneTC, OneTCMask, OneET, OneETMask)
-                        # OnePeople 0 1 2 4 => 增加或减少切片使得尺寸回到（155，240，240） => NII
+                      
                         for idz in range(OneWT.shape[0]):
                             for idx in range(OneWT.shape[1]):
                                 for idy in range(OneWT.shape[2]):
@@ -224,20 +224,20 @@ def main():
                         sitk.WriteImage(saveout, savedir + LastName + ".nii.gz")
 
                         LastName = NameNow
-                        # 创建两个全黑的三维矩阵，分别分别拼接后的预测、拼接后的Mask
+                       
                         OnePeople = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneMask = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 创建三个全黑的三维矩阵，分别用于预测出来的WT、TC、ET分块的拼接
+                       
                         OneWT = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneTC = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneET = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 创建三个全黑的三维矩阵，分别用于真实的WT、TC、ET分块的拼接
+                        
                         OneWTMask = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneTCMask = np.zeros([160, 160, 160], dtype=np.uint8)
                         OneETMask = np.zeros([160, 160, 160], dtype=np.uint8)
-                        # 处理预测后的分块
+                     
                         # (2, 3, 32, 160, 160) output
-                        # 预测分块的拼接
+                     
                         for idz in range(output.shape[2]):
                             for idx in range(output.shape[3]):
                                 for idy in range(output.shape[4]):
@@ -247,12 +247,12 @@ def main():
                                         OneTC[PatchPosition + idz, idx, idy] = 1
                                     if output[i, 2, idz, idx, idy] > 0.5:  # ET拼接
                                         OneET[PatchPosition + idz, idx, idy] = 1
-                        # Mask分块的拼接
+                   
                         OneWTMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 0, :, :, :]
                         OneTCMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 1, :, :, :]
                         OneETMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 2, :, :, :]
                     if (NameNow == LastName):
-                        # 预测分块的拼接
+                   
                         for idz in range(output.shape[2]):
                             for idx in range(output.shape[3]):
                                 for idy in range(output.shape[4]):
@@ -262,16 +262,16 @@ def main():
                                         OneTC[PatchPosition + idz, idx, idy] = 1
                                     if output[i, 2, idz, idx, idy] > 0.5:  # ET拼接
                                         OneET[PatchPosition + idz, idx, idy] = 1
-                        # Mask分块的拼接
+                 
                         OneWTMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 0, :, :, :]
                         OneTCMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 1, :, :, :]
                         OneETMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 2, :, :, :]
 
-                    # 最后一个分块从这里结束
+                  
                     if mynum == len(val_loader)-1:
-                        # 计算指标
+                      
                         CalculateWTTCET(OneWT, OneWTMask, OneTC, OneTCMask, OneET, OneETMask)
-                        # OnePeople 0 1 2 4 => 增加或减少切片使得尺寸回到（155，240，240） => NII
+                       
                         for idz in range(OneWT.shape[0]):
                             for idx in range(OneWT.shape[1]):
                                 for idy in range(OneWT.shape[2]):
