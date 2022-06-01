@@ -243,9 +243,9 @@ def main():
                                 for idy in range(output.shape[4]):
                                     if output[i, 0, idz, idx, idy] > 0.5:  # WT
                                         OneWT[PatchPosition + idz, idx, idy] = 1
-                                    if output[i, 1, idz, idx, idy] > 0.5:  # TC                                        OneTC[PatchPosition + idz, idx, idy] = 1
+                                    if output[i, 1, idz, idx, idy] > 0.5:  # TC                
                                     if output[i, 2, idz, idx, idy] > 0.5:  # ET
-                                        OneET[PatchPosition + idz, idx, idy] = 1
+                                        #OneET[PatchPosition + idz, idx, idy] = 1
                    
                         OneWTMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 0, :, :, :]
                         OneTCMask[PatchPosition:(PatchPosition + output.shape[2]), :, :] = target[i, 1, :, :, :]
