@@ -134,8 +134,8 @@ def main():
     model = model.cuda()
 
     # Data loading code
-    img_paths = glob(r'D:\Project\CollegeDesign\dataset\BraTs3D\testImage\*')
-    mask_paths = glob(r'D:\Project\CollegeDesign\dataset\BraTs3D\testMask\*')
+    img_paths = glob(r'..\dataset\BraTs3D\testImage\*')
+    mask_paths = glob(r'..\dataset\BraTs3D\testMask\*')
 
     val_img_paths = img_paths
     val_mask_paths = mask_paths
