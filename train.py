@@ -37,7 +37,7 @@ parser.add_argument('--description',
                     type=str)
 
 # DataSet Information
-parser.add_argument('--root', default='/home/wn/MISSU/data', type=str)
+parser.add_argument('--root', default='../data', type=str)
 
 parser.add_argument('--train_dir', default='Train', type=str)
 
@@ -113,8 +113,8 @@ def main_worker():
         logging.info('--------------------------------------This is all argsurations----------------------------------')
         for arg in vars(args):
             logging.info('{}={}'.format(arg, getattr(args, arg)))
-        logging.info('----------------------------------------This is a halving line----------------------------------')
-        logging.info('{}'.format(args.description))
+          logging.info('----------------------------------------This is a halving line----------------------------------')
+          logging.info('{}'.format(args.description))
 
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
