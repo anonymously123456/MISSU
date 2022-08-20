@@ -10,7 +10,7 @@ The BraTS 2019 could be acquired from here: https://ipp.cbica.upenn.edu/jobs/104
 
 The liver tumor dataset CHAOS could be acquired from here: https://zenodo.org/record/3431873#.YwFeQi_4jUp.
 # Data Preprocess
-Your data is needed which is to convert the .nii files as .pkl files and realize date normalization.
+You shold download dataset and put data under /data directory, all data should be transform to .pkl.
 # Training
 Please using following commands to train a model.
 
