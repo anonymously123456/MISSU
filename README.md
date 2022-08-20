@@ -13,8 +13,10 @@ The liver tumor dataset CHAOS could be acquired from here: https://zenodo.org/re
 Your data is needed which is to convert the .nii files as .pkl files and realize date normalization.
 # Training
 Please using following commands to train a model.
+
 python train.py
 # Testing
+
 python test.py
 
 After the testing process stops, you can upload the submission file here: https://ipp.cbica.upenn.edu/.
