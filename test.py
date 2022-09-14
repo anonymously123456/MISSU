@@ -17,56 +17,6 @@ from predict import validate_softmax
 from models.MISSU.MISSU_downsample8x_skipconnection import MISSU
 
 
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--user', default='name of user', type=str)
-
-parser.add_argument('--root', default='/home/wn/MISSU/data', type=str)
-
-parser.add_argument('--valid_dir', default='Valid', type=str)
-
-parser.add_argument('--valid_file', default='valid.txt', type=str)
-
-parser.add_argument('--output_dir', default='output', type=str)
-
-parser.add_argument('--submission', default='submission', type=str)
-
-parser.add_argument('--visual', default='visualization', type=str)
-
-parser.add_argument('--experiment', default='', type=str)
-
-parser.add_argument('--test_date', default='', type=str)
-
-parser.add_argument('--test_file', default='', type=str)
-
-parser.add_argument('--use_TTA', default=True, type=bool)
-
-parser.add_argument('--post_process', default=True, type=bool)
-
-parser.add_argument('--save_format', default='nii', choices=['npy', 'nii'], type=str)
-
-parser.add_argument('--crop_H', default=128, type=int)
-
-parser.add_argument('--crop_W', default=128, type=int)
-
-parser.add_argument('--crop_D', default=128, type=int)
-
-parser.add_argument('--seed', default=1000, type=int)
-
-parser.add_argument('--model_name', default='TransBTS', type=str)
-
-parser.add_argument('--num_class', default=4, type=int)
-
-parser.add_argument('--no_cuda', default=False, type=bool)
-
-parser.add_argument('--gpu', default='0,1', type=str)
-
-parser.add_argument('--num_workers', default=4, type=int)
-
-args = parser.parse_args()
-
-
 def main():
 
     torch.manual_seed(args.seed)
