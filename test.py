@@ -24,7 +24,7 @@ def main():
     random.seed(args.seed)
     np.random.seed(args.seed)
 
-    _, model = TransBTS(dataset='brats', _conv_repr=True, _pe_type="learned")
+    _, model = MISSU(dataset='brats', _conv_repr=True, _pe_type="learned")
 
     model = torch.nn.DataParallel(model).cuda()
 
