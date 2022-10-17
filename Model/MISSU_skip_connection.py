@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from models.MISSU.Transformer import TransformerModel
-from models.MISSU.PositionalEncoding import FixedPositionalEncoding,LearnedPositionalEncoding
-from models.MISSU.Unet_skipconnection import Unet
+from Model.Transformer import TransformerModel
+from Model.PositionalEncoding import FixedPositionalEncoding,LearnedPositionalEncoding
+from Model.Unet_skipconnection import Unet
 from functools import partial
 import torch.nn.functional as F
 
