@@ -1,5 +1,5 @@
 import torch.nn as nn
-from models.TransBTS.IntmdSequential import IntermediateSequential
+from Model.IntmdSequential import IntermediateSequential
 from torch import Tensor
 import torch.nn.functional as F
 
